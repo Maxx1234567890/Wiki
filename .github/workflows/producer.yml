@@ -1,0 +1,32 @@
+# .github/workflows/producer.yml
+name: Wikipedia Data Producer
+
+on:
+  schedule:
+    # Chạy mỗi 10 phút
+    - cron: "*/300 * * * *"
+  workflow_dispatch: # Cho phép bạn chạy thủ công từ tab Actions
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install sseclient-py requests
+
+      - name: Run Wikipedia Stream Producer
+        env:
+          # Sử dụng Secret
+          TINYBIRD_TOKEN: ${{ secrets.TINYBIRD_TOKEN }} 
+        run: |
+          # Chạy script Python, đặt thời gian chạy là 10 phút (600 giây)
+          python producer.py --timeout=300
